@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.litespring.beans.ConstructorArgument;
 import org.litespring.beans.PropertyValue;
 import org.litespring.beans.factory.BeanDefinition;
 import org.litespring.beans.factory.config.RuntimeBeanReference;
@@ -47,6 +48,11 @@ public class XmlBeanDefinitionReader {
     public static final String VALUE_ATTRIBUTE = "value";
 
     public static final String NAME_ATTRIBUTE = "name";
+
+    // 增加故造器注入
+    public static final String CONSTRUCTOR_ARG_ELEMENT = "constructor-arg";
+
+    public static final String TYPE_ATTRIBUTE = "type";
 
     protected final Log logger = LogFactory.getLog(getClass());
 
@@ -101,6 +107,9 @@ public class XmlBeanDefinitionReader {
                 // 保存在map中,当调用getBeanDefinition 时候直接去map中获取
                 // this.beanDefinitionMap.put(id, bd);
 
+
+                // 实现解析 ConstructorArg 构造器
+                parseConstructorArgElements(ele, bd);
                 // 实现PropertyValue相关的
                 parsePropertyElement(ele, bd);
 
@@ -186,6 +195,47 @@ public class XmlBeanDefinitionReader {
             // 如果遇到 RuntimeException 异常说明可能是 property 写的不对
             throw new RuntimeException(elementName + " must specify a ref or value");
         }
+    }
+
+
+    /**
+     * 用于解析xml 中 构造器注入
+     * @param beanEle
+     * @param bd
+     */
+    public void parseConstructorArgElements(Element beanEle, BeanDefinition bd) {
+
+        // 解析xml中有没有 ConstructorArg 参数
+        Iterator iter = beanEle.elementIterator(CONSTRUCTOR_ARG_ELEMENT);
+        while(iter.hasNext()){
+            Element ele = (Element)iter.next();
+            parseConstructorArgElement(ele, bd);
+        }
+
+    }
+
+    /**
+     * 遍历解析 ConstructorArg
+     * @param ele
+     * @param bd
+     */
+    public void parseConstructorArgElement(Element ele, BeanDefinition bd) {
+
+        String typeAttr = ele.attributeValue(TYPE_ATTRIBUTE);
+        String nameAttr = ele.attributeValue(NAME_ATTRIBUTE);
+
+        // 去判断 value 和ref 这两个
+        Object value = parsePropertyValue(ele, bd, null);
+        ConstructorArgument.ValueHolder valueHolder = new ConstructorArgument.ValueHolder(value);
+        if (StringUtils.hasLength(typeAttr)) {
+            valueHolder.setType(typeAttr);
+        }
+        if (StringUtils.hasLength(nameAttr)) {
+            valueHolder.setName(nameAttr);
+        }
+
+        // 加入到list中
+        bd.getConstructorArgument().addArgumentValue(valueHolder);
     }
 
 }

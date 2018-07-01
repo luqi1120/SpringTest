@@ -1,5 +1,6 @@
 package org.litespring.beans.factory;
 
+import org.litespring.beans.ConstructorArgument;
 import org.litespring.beans.PropertyValue;
 
 import java.util.List;
@@ -30,4 +31,10 @@ public interface BeanDefinition {
      * @return 返回对象的集合
      */
     List<PropertyValue> getPropertyValues();
+
+    ConstructorArgument getConstructorArgument();
+
+    String getID();
+
+    boolean hasConstructorArgumentValues();
 }

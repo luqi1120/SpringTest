@@ -21,7 +21,7 @@ public class BeanCreationException extends BeansException {
         this.beanName = beanName;
     }
 
-    public BeanCreationException(String message, Throwable cause, String beanName) {
+    public BeanCreationException(String message, String beanName, Throwable cause) {
         this(beanName, message);
     }
 
