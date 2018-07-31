@@ -34,6 +34,10 @@ public class GenericBeanDefinition implements BeanDefinition {
         this.beanClassName = beanClassName;
     }
 
+    public GenericBeanDefinition() {
+
+    }
+
 
     public List<PropertyValue> getPropertyValues() {
         return propertyValues;
@@ -63,6 +67,10 @@ public class GenericBeanDefinition implements BeanDefinition {
         return this.beanClassName;
     }
 
+    public void setBeanClassName(String className) {
+        this.beanClassName = className;
+    }
+
     /**
      * 实现构造器注入
      * @return
@@ -81,5 +89,9 @@ public class GenericBeanDefinition implements BeanDefinition {
      */
     public boolean hasConstructorArgumentValues() {
         return !this.constructorArgument.isEmpty();
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

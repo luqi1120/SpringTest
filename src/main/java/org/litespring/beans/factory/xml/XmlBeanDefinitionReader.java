@@ -12,6 +12,7 @@ import org.litespring.beans.factory.config.RuntimeBeanReference;
 import org.litespring.beans.factory.config.TypedStringValue;
 import org.litespring.beans.factory.support.BeanDefinitionRegistry;
 import org.litespring.beans.factory.support.GenericBeanDefinition;
+import org.litespring.context.annotation.ClassPathBeanDefinitionScanner;
 import org.litespring.core.io.Resource;
 import org.litespring.util.StringUtils;
 
@@ -54,6 +55,12 @@ public class XmlBeanDefinitionReader {
 
     public static final String TYPE_ATTRIBUTE = "type";
 
+    public static final String BEANS_NAMESPACE_URI = "http://www.springframework.org/schema/beans";
+
+    public static final String CONTEXT_NAMESPACE_URI = "http://www.springframework.org/schema/context";
+
+    private static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
+
     protected final Log logger = LogFactory.getLog(getClass());
 
 
@@ -95,26 +102,36 @@ public class XmlBeanDefinitionReader {
             // 遍历 beans下面的bean
             while (iter.hasNext()) {
                 Element ele = iter.next();
-                String id = ele.attributeValue(ID_ATTRIBUTE);
-                String beanClassName = ele.attributeValue(CLASS_ATTRIBUTE);
-                BeanDefinition bd = new GenericBeanDefinition(id, beanClassName);
 
-                // 判断scope是不是为null
-                if (ele.attribute(SCOPE_ATTRIBUTE) != null) {
-                    bd.setScope(ele.attributeValue(SCOPE_ATTRIBUTE));
+                // 增加判断，注解需要的地方
+                String namespaceUri = ele.getNamespaceURI();
+                if(this.isDefaultNamespace(namespaceUri)){
+                    parseDefaultElement(ele); //普通的bean
+                } else if(this.isContextNamespace(namespaceUri)){
+                    parseComponentElement(ele); //例如<context:component-scan>
                 }
 
-                // 保存在map中,当调用getBeanDefinition 时候直接去map中获取
-                // this.beanDefinitionMap.put(id, bd);
 
-
-                // 实现解析 ConstructorArg 构造器
-                parseConstructorArgElements(ele, bd);
-                // 实现PropertyValue相关的
-                parsePropertyElement(ele, bd);
-
-                // 调用接口的组册方法
-                this.registry.registerBeanDefinition(id,bd);
+//                String id = ele.attributeValue(ID_ATTRIBUTE);
+//                String beanClassName = ele.attributeValue(CLASS_ATTRIBUTE);
+//                BeanDefinition bd = new GenericBeanDefinition(id, beanClassName);
+//
+//                // 判断scope是不是为null
+//                if (ele.attribute(SCOPE_ATTRIBUTE) != null) {
+//                    bd.setScope(ele.attributeValue(SCOPE_ATTRIBUTE));
+//                }
+//
+//                // 保存在map中,当调用getBeanDefinition 时候直接去map中获取
+//                // this.beanDefinitionMap.put(id, bd);
+//
+//
+//                // 实现解析 ConstructorArg 构造器
+//                parseConstructorArgElements(ele, bd);
+//                // 实现PropertyValue相关的
+//                parsePropertyElement(ele, bd);
+//
+//                // 调用接口的组册方法
+//                this.registry.registerBeanDefinition(id,bd);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -236,6 +253,37 @@ public class XmlBeanDefinitionReader {
 
         // 加入到list中
         bd.getConstructorArgument().addArgumentValue(valueHolder);
+    }
+
+    /**
+     * 解析
+     * @param namespaceUri
+     * @return
+     */
+    public boolean isDefaultNamespace(String namespaceUri) {
+        return (!StringUtils.hasLength(namespaceUri) || BEANS_NAMESPACE_URI.equals(namespaceUri));
+    }
+    public boolean isContextNamespace(String namespaceUri){
+        return (!StringUtils.hasLength(namespaceUri) || CONTEXT_NAMESPACE_URI.equals(namespaceUri));
+    }
+
+    private void parseComponentElement(Element ele) {
+        String basePackages = ele.attributeValue(BASE_PACKAGE_ATTRIBUTE);
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(registry);
+        scanner.doScan(basePackages);
+
+    }
+    private void parseDefaultElement(Element ele) {
+        String id = ele.attributeValue(ID_ATTRIBUTE);
+        String beanClassName = ele.attributeValue(CLASS_ATTRIBUTE);
+        BeanDefinition bd = new GenericBeanDefinition(id,beanClassName);
+        if (ele.attribute(SCOPE_ATTRIBUTE)!=null) {
+            bd.setScope(ele.attributeValue(SCOPE_ATTRIBUTE));
+        }
+        parseConstructorArgElements(ele,bd);
+        parsePropertyElement(ele,bd);
+        this.registry.registerBeanDefinition(id, bd);
+
     }
 
 }
