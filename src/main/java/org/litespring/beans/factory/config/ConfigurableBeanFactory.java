@@ -1,13 +1,11 @@
 package org.litespring.beans.factory.config;
 
-import org.litespring.beans.factory.BeanFactory;
-
 /**
  * 配置classLoader
  * @author luqi
  * @data 2018/6/17
  */
-public interface ConfigurableBeanFactory extends BeanFactory {
+public interface ConfigurableBeanFactory extends AutowireCapableBeanFactory {
 
     /**
      * 如方法名
