@@ -1,5 +1,7 @@
 package org.litespring.beans.factory.config;
 
+import java.util.List;
+
 /**
  * 配置classLoader
  * @author luqi
@@ -18,4 +20,8 @@ public interface ConfigurableBeanFactory extends AutowireCapableBeanFactory {
      * @return classLoader
      */
     ClassLoader getBeanClassLoader();
+
+    void addBeanPostProcessor(BeanPostProcessor postProcessor);
+
+    List<BeanPostProcessor> getBeanPostProcessors();
 }

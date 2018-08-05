@@ -8,7 +8,7 @@ import org.junit.runners.Suite;
  * @data 2018/8/5
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ AutowiredAnnotationProcessorTest.class,
+@Suite.SuiteClasses({ ApplicationContextTest4.class, AutowiredAnnotationProcessorTest.class,
         ClassPathBeanDefinitionScannerTest.class, ClassReaderTest.class, DependencyDescriptorTest.class,
         InjectionMetadataTest.class, MetadataReaderTest.class, PackageResourceLoaderTest.class,
         XmlBeanDefinitionReaderTest.class })
