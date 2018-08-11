@@ -4,6 +4,7 @@ import org.litespring.beans.PropertyValue;
 import org.litespring.beans.SimpleTypeConverter;
 import org.litespring.beans.factory.BeanDefinition;
 import org.litespring.beans.factory.BeanFactory;
+import org.litespring.beans.factory.NoSuchBeanDefinitionException;
 import org.litespring.beans.factory.config.BeanPostProcessor;
 import org.litespring.beans.factory.config.ConfigurableBeanFactory;
 import org.litespring.beans.factory.config.DependencyDescriptor;
@@ -215,5 +216,15 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements
                 throw new RuntimeException("can't load class:"+bd.getBeanClassName());
             }
         }
+    }
+
+    /** 给定一个bean的 name 去获取这个bean对应的class */
+    public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
+        BeanDefinition bd = this.getBeanDefinition(name);
+        if(bd == null){
+            throw new NoSuchBeanDefinitionException(name);
+        }
+        resolveBeanClass(bd);
+        return bd.getBeanClass();
     }
 }
