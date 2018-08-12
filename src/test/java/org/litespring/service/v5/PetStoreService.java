@@ -33,6 +33,7 @@ public class PetStoreService {
     public void placeOrder() {
         System.out.println("place order");
         MessageTracker.addMsg("place order");
+//        throw new NullPointerException();
     }
 
 
