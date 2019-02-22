@@ -36,6 +36,7 @@ public class CglibProxyFactory implements AopProxyFactory {
     private static final int INVOKE_HASHCODE = 6;
 
 
+
     /**
      * Logger available to subclasses; static to optimize serialization
      */
